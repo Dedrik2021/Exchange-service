@@ -2,7 +2,7 @@
 	<div>
 		<!-- NAVBAR -->
 		<header class="header">
-			<nav class="navbar">
+			<nav class="navbar" :class="$route.path === '/' ? '' : 'with-background'">
 				<div class="container">
 					<div class="navbar-brand">
 						<a
@@ -23,17 +23,13 @@
 						</span>
 					</div>
 					<div id="navbar-menu" class="navbar-menu">
-						<div class="navbar-end">
-							<!-- Loop through the navigation items -->
-							<a
-								class="navbar-item nav-home"
-								v-for="item in items"
-								:href="item.link"
-								:key="item.text"
-							>
-								{{ item.text }}
-							</a>
-						</div>
+						<ul class="navbar-end">
+							<li class="navbar-end__item" v-for="item in items" :key="item.text">
+								<router-link class="navbar-item nav-home" :to="item.link">
+									{{ item.text }}
+								</router-link>
+							</li>
+						</ul>
 					</div>
 				</div>
 			</nav>
@@ -47,13 +43,20 @@ export default {
 	props: {
 		title: {
 			type: String,
-			required: true
+			required: true,
 		},
 
 		items: {
 			type: Array,
-			required: true
+			required: true,
 		},
 	},
 };
 </script>
+
+<style lang="scss" scoped>
+.navbar-end {
+	align-items: center;
+	justify-content: center;
+}
+</style>
