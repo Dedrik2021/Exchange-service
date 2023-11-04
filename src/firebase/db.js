@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app';
 import {getFirestore} from 'firebase/firestore'
 
 const firebaseConfig = {
-	apiKey: process.env.APY_KEY,
+	apiKey: 'AIzaSyCnZrhUcohbpki1_awFV4hb4IjVTstrL-Q',
 	authDomain: 'exchangario-41e73.firebaseapp.com',
 	projectId: 'exchangario-41e73',
 	storageBucket: 'exchangario-41e73.appspot.com',
