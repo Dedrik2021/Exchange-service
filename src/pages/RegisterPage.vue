@@ -4,10 +4,12 @@
 			<div class="column is-4 is-offset-4">
 				<h3 class="title has-text-grey">Register</h3>
 				<div class="box">
-					<form>
+					<form @submit="(e) => register(e)">
 						<div class="field">
 							<div class="control">
+								<label for="email"></label>
 								<input
+									id="email"
 									v-model="form.email"
 									class="input is-large"
 									type="email"
@@ -21,7 +23,9 @@
 						</div>
 						<div class="field">
 							<div class="control">
+								<label for="username"></label>
 								<input
+									id="username"
 									v-model="form.username"
 									class="input is-large"
 									type="text"
@@ -31,7 +35,9 @@
 						</div>
 						<div class="field">
 							<div class="control">
+								<label for="password"></label>
 								<input
+									id="password"
 									v-model="form.password"
 									class="input is-large"
 									type="password"
@@ -42,9 +48,11 @@
 						</div>
 						<div class="field">
 							<div class="control">
+								<label for="repeat-password"></label>
 								<input
 									v-model="form.confirmPassword"
 									class="input is-large"
+									id="repeat-password"
 									type="password"
 									placeholder="Repeat the password"
 								/>
@@ -52,8 +60,7 @@
 						</div>
 						<button
 							:disabled="isProcessing"
-							@click="() => register(form)"
-							type="button"
+							type="submit"
 							class="button is-block is-info is-large is-fullwidth"
 						>
 							Sign Up
@@ -72,7 +79,6 @@
 <script>
 // import { mapState } from 'vuex';
 
-import useRegister from '../composition/useRegister';
 import useAuth from '../composition/useAuth';
 
 export default {
@@ -88,17 +94,28 @@ export default {
 	},
 
 	setup() {
-		const {register} = useRegister();
 		const { error, isProcessing } = useAuth();
-		
-		return { register, error, isProcessing };
+		return { error, isProcessing };
 	},
-	// methods: {
-	// 	onSubmit() {
-	// 		console.log(JSON.stringify(this.form));
-	// 		this.$store.dispatch('user/register', this.form);
-	// 	},
-	// },
+
+	watch: {
+		// error(message) {
+		// 	if (message) console.log(message);
+		// },
+
+		isProcessing(processing, prevProcessing) {
+			if (!processing && prevProcessing && !this.error) {
+				this.$router.push('/')
+			}
+		}
+	},
+
+	methods: {
+		register(e) {
+			e.preventDefault();
+			this.$store.dispatch('user/register', this.form);
+		},
+	},
 
 	// computed: mapState('user', {
 	// 	error: ({ register }) => register.error,
