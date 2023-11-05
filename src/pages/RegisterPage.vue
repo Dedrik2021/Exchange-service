@@ -52,7 +52,7 @@
 						</div>
 						<button
 							:disabled="isProcessing"
-							@click="onSubmit"
+							@click="() => register(form)"
 							type="button"
 							class="button is-block is-info is-large is-fullwidth"
 						>
@@ -70,7 +70,9 @@
 </template>
 
 <script>
-	import {mapState} from 'vuex'
+import { mapState } from 'vuex';
+
+import useRegister from '../composition/useRegister';
 
 export default {
 	data() {
@@ -84,16 +86,20 @@ export default {
 		};
 	},
 
-	methods: {
-		onSubmit() {
-			console.log(JSON.stringify(this.form));
-			this.$store.dispatch('user/register', this.form);
-		},
+	setup() {
+		const register = useRegister()
+		return register;
 	},
+	// methods: {
+	// 	onSubmit() {
+	// 		console.log(JSON.stringify(this.form));
+	// 		this.$store.dispatch('user/register', this.form);
+	// 	},
+	// },
 
-	computed: mapState("user", {
-		error: (({register}) => register.error),
-		isProcessing: (({register}) => register.isProcessing)
+	computed: mapState('user', {
+		error: ({ register }) => register.error,
+		isProcessing: ({ register }) => register.isProcessing,
 
 		// error() {
 		// 	return this.$store.state.user.register.error;
