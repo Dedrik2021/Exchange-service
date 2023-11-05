@@ -1,4 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
+import { database } from '../../firebase/db';
 
 export default {
 	namespaced: true,
@@ -13,17 +16,27 @@ export default {
 	},
 
 	actions: {
-		async register({ commit, dispatch }, { email, password }) {
+		async register({ commit, dispatch }, { email, username, password  }) {
 			commit('setRegisterIsProcessing', true);
 			commit('setRegisterError', '');
 
 			const auth = getAuth();
 			try {
-				const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
-				dispatch('toast/success', `You are register success on ${email} email address`, {
-					root: true,
+				const { user } = await createUserWithEmailAndPassword(auth, email, password);
+				dispatch(
+					'toast/success',
+					`Congratulations ${username}! You are registered successfully!`,
+					{
+						root: true,
+					},
+				);
+				await dispatch('createUserProfile', {
+					id: user.uid,
+					username,
+					avatar: 'https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745',
+                    credit: 0,
+                    exchanges: []
 				});
-				return userCredentials.user;
 			} catch (error) {
 				console.error(error.message);
 				commit('setRegisterError', error.message);
@@ -32,6 +45,10 @@ export default {
 				commit('setRegisterIsProcessing', false);
 			}
 		},
+
+		async createUserProfile(_, { id, ...profile }) {
+            await setDoc(doc(database, "users", id), profile)
+        },
 	},
 
 	mutations: {
