@@ -70,9 +70,10 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+// import { mapState } from 'vuex';
 
 import useRegister from '../composition/useRegister';
+import useAuth from '../composition/useAuth';
 
 export default {
 	data() {
@@ -87,8 +88,10 @@ export default {
 	},
 
 	setup() {
-		const register = useRegister()
-		return register;
+		const {register} = useRegister();
+		const { error, isProcessing } = useAuth();
+		
+		return { register, error, isProcessing };
 	},
 	// methods: {
 	// 	onSubmit() {
@@ -97,18 +100,18 @@ export default {
 	// 	},
 	// },
 
-	computed: mapState('user', {
-		error: ({ register }) => register.error,
-		isProcessing: ({ register }) => register.isProcessing,
+	// computed: mapState('user', {
+	// 	error: ({ register }) => register.error,
+	// 	isProcessing: ({ register }) => register.isProcessing,
 
-		// error() {
-		// 	return this.$store.state.user.register.error;
-		// },
+	// 	// error() {
+	// 	// 	return this.$store.state.user.register.error;
+	// 	// },
 
-		// isProcessing() {
-		// 	return this.$store.state.user.register.isProcessing;
-		// },
-	}),
+	// 	// isProcessing() {
+	// 	// 	return this.$store.state.user.register.isProcessing;
+	// 	// },
+	// }),
 };
 </script>
 
