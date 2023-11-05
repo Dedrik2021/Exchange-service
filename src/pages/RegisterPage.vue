@@ -51,6 +51,7 @@
 							</div>
 						</div>
 						<button
+							:disabled="isProcessing"
 							@click="onSubmit"
 							type="button"
 							class="button is-block is-info is-large is-fullwidth"
@@ -69,6 +70,8 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex'
+
 export default {
 	data() {
 		return {
@@ -88,15 +91,18 @@ export default {
 		},
 	},
 
-	computed: {
-		error() {
-			return this.$store.state.user.register.error;
-		},
+	computed: mapState("user", {
+		error: (({register}) => register.error),
+		isProcessing: (({register}) => register.isProcessing)
 
-		isProcessing() {
-			return this.$store.state.user.register.isProcessing;
-		},
-	},
+		// error() {
+		// 	return this.$store.state.user.register.error;
+		// },
+
+		// isProcessing() {
+		// 	return this.$store.state.user.register.isProcessing;
+		// },
+	}),
 };
 </script>
 
