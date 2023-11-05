@@ -8,7 +8,7 @@
 						<div class="field">
 							<div class="control">
 								<input
-                                    v-model="form.email"
+									v-model="form.email"
 									class="input is-large"
 									type="email"
 									placeholder="Email"
@@ -21,13 +21,18 @@
 						</div>
 						<div class="field">
 							<div class="control">
-								<input v-model="form.username" class="input is-large" type="text" placeholder="Username" />
+								<input
+									v-model="form.username"
+									class="input is-large"
+									type="text"
+									placeholder="Username"
+								/>
 							</div>
 						</div>
 						<div class="field">
 							<div class="control">
 								<input
-                                    v-model="form.password"
+									v-model="form.password"
 									class="input is-large"
 									type="password"
 									placeholder="Password"
@@ -38,14 +43,18 @@
 						<div class="field">
 							<div class="control">
 								<input
-                                    v-model="form.confirmPassword"
+									v-model="form.confirmPassword"
 									class="input is-large"
 									type="password"
 									placeholder="Repeat the password"
 								/>
 							</div>
 						</div>
-						<button @click="onSubmit" type="button" class="button is-block is-info is-large is-fullwidth">
+						<button
+							@click="onSubmit"
+							type="button"
+							class="button is-block is-info is-large is-fullwidth"
+						>
 							Sign Up
 						</button>
 					</form>
@@ -62,22 +71,32 @@
 <script>
 export default {
 	data() {
-        return {
-            form: {
-                email: "",
-                username: "",
-                password: "",
-                confirmPassword: ""
-            }
-        }
-    },
+		return {
+			form: {
+				email: '',
+				username: '',
+				password: '',
+				confirmPassword: '',
+			},
+		};
+	},
 
-    methods: {
-        onSubmit() {
-            console.log(JSON.stringify(this.form));
-            this.$store.dispatch('user/register', this.form)
-        }
-    },
+	methods: {
+		onSubmit() {
+			console.log(JSON.stringify(this.form));
+			this.$store.dispatch('user/register', this.form);
+		},
+	},
+
+	computed: {
+		error() {
+			return this.$store.state.user.register.error;
+		},
+
+		isProcessing() {
+			return this.$store.state.user.register.isProcessing;
+		},
+	},
 };
 </script>
 
