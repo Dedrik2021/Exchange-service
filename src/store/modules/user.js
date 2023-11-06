@@ -16,6 +16,12 @@ export default {
 		};
 	},
 
+    getters: {
+        isAuthenticated(state) {
+            return !!state.data
+        }
+    },
+
 	actions: {
         onAuthChange({dispatch}) {
             onAuthStateChanged(getAuth(), (user) => {

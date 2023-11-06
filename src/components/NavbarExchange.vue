@@ -33,12 +33,14 @@
 					</div>
 				</div>
 			</nav>
+			is Auth: {{ isAuthenticated }}
 		</header>
 		<!-- NAVBAR END -->
 	</div>
 </template>
 
 <script>
+import useAuth from '@/composition/useAuth';
 export default {
 	props: {
 		title: {
@@ -50,6 +52,11 @@ export default {
 			type: Array,
 			required: true,
 		},
+	},
+
+	setup() {
+		const { isAuthenticated } = useAuth();
+		return { isAuthenticated };
 	},
 };
 </script>
