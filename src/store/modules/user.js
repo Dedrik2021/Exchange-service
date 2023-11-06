@@ -1,5 +1,5 @@
 import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 import { database } from '../../firebase/db';
 
@@ -16,6 +16,23 @@ export default {
 	},
 
 	actions: {
+        onAuthChange({dispatch}) {
+            onAuthStateChanged(getAuth(), async (user) => {
+                if (user) {
+                    const userProfile = await dispatch('getUserProfile', user.uid)
+                    console.log(userProfile);
+                } else {
+                    console.log("Logged out");
+                }
+            })
+        },
+
+        async getUserProfile(_, id) {
+            const docRef = doc(database, "users", id)
+            const docSnap = await getDoc(docRef)
+            return docSnap.data()
+        },
+
 		async register({ commit, dispatch }, { email, username, password  }) {
 			commit('setRegisterIsProcessing', true);
 			commit('setRegisterError', '');
@@ -50,15 +67,7 @@ export default {
             await setDoc(doc(database, "users", id), profile)
         },
 
-        onAuthChange() {
-            onAuthStateChanged(getAuth(), (user) => {
-                if (user) {
-                    console.log(user);
-                } else {
-                    console.log("Logged out");
-                }
-            })
-        }
+    
 	},
 
 	mutations: {
