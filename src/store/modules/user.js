@@ -8,6 +8,7 @@ export default {
 
 	state() {
 		return {
+            data: null,
 			register: {
 				isProcessing: false,
 				error: '',
@@ -17,20 +18,25 @@ export default {
 
 	actions: {
         onAuthChange({dispatch}) {
-            onAuthStateChanged(getAuth(), async (user) => {
+            onAuthStateChanged(getAuth(), (user) => {
                 if (user) {
-                    const userProfile = await dispatch('getUserProfile', user.uid)
-                    console.log(userProfile);
+                    dispatch('getUserProfile', user)
                 } else {
                     console.log("Logged out");
                 }
             })
         },
 
-        async getUserProfile(_, id) {
-            const docRef = doc(database, "users", id)
+        async getUserProfile({commit}, user) {
+            const docRef = doc(database, "users", user.uid)
             const docSnap = await getDoc(docRef)
-            return docSnap.data()
+            const userProfile = docSnap.data()
+            const useWithProfile = {
+                id: user.uid,
+                email: user.email,
+                ...userProfile
+            }
+            commit('setUser', useWithProfile)
         },
 
 		async register({ commit, dispatch }, { email, username, password  }) {
@@ -78,5 +84,9 @@ export default {
 		setRegisterError(state, error) {
 			state.register.error = error;
 		},
+
+        setUser(state, user) {
+            state.data = user
+        }
 	},
 };
