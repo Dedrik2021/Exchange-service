@@ -7,7 +7,6 @@ export default function useAuth() {
 
 	const error = computed(() => state.user.auth.error);
 	const isProcessing = computed(() => state.user.auth.isProcessing);
-
     const isAuthenticated = computed(() => store.getters["user/isAuthenticated"])
     const user = computed(() => state.user.data)
 

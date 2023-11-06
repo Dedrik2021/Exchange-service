@@ -24,6 +24,9 @@
 					</div>
 					<div id="navbar-menu" class="navbar-menu">
 						<ul class="navbar-end">
+							<li v-if="isAuthenticated" class="navbar-item">
+								{{user?.email}}
+							</li>
 							<li class="navbar-end__item" v-for="item in items" :key="item.text">
 								<router-link class="navbar-item nav-home" :to="item.link">
 									{{ item.text }}
@@ -55,8 +58,8 @@ export default {
 	},
 
 	setup() {
-		const { isAuthenticated } = useAuth();
-		return { isAuthenticated };
+		const { isAuthenticated, user } = useAuth();
+		return { isAuthenticated, user };
 	},
 };
 </script>
