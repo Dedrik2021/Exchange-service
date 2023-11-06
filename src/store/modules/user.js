@@ -1,4 +1,4 @@
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
 import { database } from '../../firebase/db';
@@ -49,6 +49,16 @@ export default {
 		async createUserProfile(_, { id, ...profile }) {
             await setDoc(doc(database, "users", id), profile)
         },
+
+        onAuthChange() {
+            onAuthStateChanged(getAuth(), (user) => {
+                if (user) {
+                    console.log(user);
+                } else {
+                    console.log("Logged out");
+                }
+            })
+        }
 	},
 
 	mutations: {
