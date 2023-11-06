@@ -9,7 +9,7 @@ export default {
 	state() {
 		return {
             data: null,
-			register: {
+			auth: {
 				isProcessing: false,
 				error: '',
 			},
@@ -40,8 +40,8 @@ export default {
         },
 
 		async register({ commit, dispatch }, { email, username, password  }) {
-			commit('setRegisterIsProcessing', true);
-			commit('setRegisterError', '');
+			commit('setAuthIsProcessing', true);
+			commit('setAuthError', '');
 
 			const auth = getAuth();
 			try {
@@ -62,10 +62,10 @@ export default {
 				});
 			} catch (error) {
 				console.error(error.message);
-				commit('setRegisterError', error.message);
+				commit('setAuthError', error.message);
 				dispatch('toast/error', error.message, { root: true });
 			} finally {
-				commit('setRegisterIsProcessing', false);
+				commit('setAuthIsProcessing', false);
 			}
 		},
 
@@ -77,12 +77,12 @@ export default {
 	},
 
 	mutations: {
-		setRegisterIsProcessing(state, isProcessing) {
-			state.register.isProcessing = isProcessing;
+		setAuthIsProcessing(state, isProcessing) {
+			state.auth.isProcessing = isProcessing;
 		},
 
-		setRegisterError(state, error) {
-			state.register.error = error;
+		setAuthError(state, error) {
+			state.auth.error = error;
 		},
 
         setUser(state, user) {
