@@ -59,8 +59,8 @@ export default {
 	},
 
 	setup() {
-		const { error, isProcessing } = useAuth();
-		return { error, isProcessing };
+		const { error, isProcessing,  isAuthenticated} = useAuth();
+		return { error, isProcessing,  isAuthenticated};
 	},
 
 	watch: {
@@ -68,11 +68,15 @@ export default {
 		// 	if (message) console.log(message);
 		// },
 
-		isProcessing(processing, prevProcessing) {
-			if (!processing && prevProcessing && !this.error) {
-				this.$router.push('/');
-			}
-		},
+		isAuthenticated(isAuth) {
+			if (isAuth) this.$router.push('/')
+		},	
+
+		// isProcessing(processing, prevProcessing) {
+		// 	if (!processing && prevProcessing && !this.error) {
+		// 		this.$router.push('/');
+		// 	}
+		// },
 	},
 
 	methods: {
