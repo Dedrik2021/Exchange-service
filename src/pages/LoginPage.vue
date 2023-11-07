@@ -5,11 +5,11 @@
 				<h3 class="title has-text-grey">Login</h3>
 				<p class="subtitle has-text-grey">Please login to proceed.</p>
 				<div class="box">
-					<form>
+					<form @submit="(e) => logIn(e)">
 						<div class="field">
 							<div class="control">
 								<input
-                                    v-model="form.email"
+									v-model="form.email"
 									class="input is-large"
 									type="email"
 									placeholder="Your Email"
@@ -21,7 +21,7 @@
 						<div class="field">
 							<div class="control">
 								<input
-                                    v-model="form.password"
+									v-model="form.password"
 									class="input is-large"
 									type="password"
 									placeholder="Your Password"
@@ -29,7 +29,11 @@
 								/>
 							</div>
 						</div>
-						<button @click="onSubmit" type="button" class="button is-block is-info is-large is-fullwidth">
+						<button
+							:disabled="isProcessing"
+							type="submit"
+							class="button is-block is-info is-large is-fullwidth"
+						>
 							Sign In
 						</button>
 					</form>
@@ -43,21 +47,40 @@
 	</div>
 </template>
 <script>
+import useAuth from '../composition/useAuth';
 export default {
-    data() {
-        return {
-            form: {
-                email: "",
-                password: ""
-            }
-        }
-    },
+	data() {
+		return {
+			form: {
+				email: '',
+				password: '',
+			},
+		};
+	},
 
-    methods: {
-        onSubmit() {
-            console.log(JSON.stringify(this.form))
-        }
-    }
+	setup() {
+		const { error, isProcessing } = useAuth();
+		return { error, isProcessing };
+	},
+
+	watch: {
+		// error(message) {
+		// 	if (message) console.log(message);
+		// },
+
+		isProcessing(processing, prevProcessing) {
+			if (!processing && prevProcessing && !this.error) {
+				this.$router.push('/');
+			}
+		},
+	},
+
+	methods: {
+		logIn(e) {
+			e.preventDefault();
+			this.$store.dispatch('user/logIn', this.form);
+		},
+	},
 };
 </script>
 
