@@ -18,8 +18,7 @@ export default {
 			auth: {
                 isProcessing: false,
 				error: '',
-			},
-            day: ''
+			}
 		};
 	},
 
@@ -30,12 +29,18 @@ export default {
 	},
 
 	actions: {
-		onAuthChange({ dispatch }) {
-			onAuthStateChanged(getAuth(), (user) => {
+		onAuthChange({ dispatch, commit }, callback) {
+            commit("setAuthIsProcessing", true)
+
+			onAuthStateChanged(getAuth(), async (user) => {
 				if (user) {
-					dispatch('getUserProfile', user);
+					await dispatch('getUserProfile', user);
+                    commit("setAuthIsProcessing", false)
+                    callback(user)
 				} else {
 					console.log('Logged out');
+                    commit("setAuthIsProcessing", false)
+                    callback(null)
 				}
 			});
 		},
@@ -98,13 +103,13 @@ export default {
 			}
 		},
 
-		async logIn({ commit, dispatch }, { email, password }) {
+		async logIn({commit, dispatch}, { email, password }) {
 			commit('setAuthIsProcessing', true);
 			commit('setAuthError', '');
 
 			try {
 				const { user } = await signInWithEmailAndPassword(getAuth(), email, password);
-				dispatch('toast/success', `${this.day} ${user.email}!`, { root: true });
+				dispatch('toast/success', `Hello ${user.email}!`, { root: true });
 			} catch (e) {
 				console.error(e);
 				dispatch('toast/error', e.message, { root: true });
@@ -112,7 +117,7 @@ export default {
 			} finally {
 				commit('setAuthIsProcessing', false);
 			}
-		},
+		}
 	},
 
 	mutations: {

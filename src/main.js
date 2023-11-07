@@ -9,12 +9,16 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
-store.dispatch('user/onAuthChange');
-
 library.add(faStar);
-const app = createApp(App);
+let app;
 
-app.use(store).use(router).use(Toast);
+store.dispatch('user/onAuthChange', () => {
+	if (!app) {
+		app = createApp(App);
 
-app.component('font-awesome-icon', FontAwesomeIcon);
-app.mount('#app');
+		app.use(store).use(router).use(Toast);
+
+		app.component('font-awesome-icon', FontAwesomeIcon);
+		app.mount('#app');
+	}
+});
