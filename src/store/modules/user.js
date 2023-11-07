@@ -1,4 +1,4 @@
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 import { database } from '../../firebase/db';
@@ -79,7 +79,15 @@ export default {
             await setDoc(doc(database, "users", id), profile)
         },
 
-    
+        async logout({commit, dispatch}) {
+            try {
+                await signOut(getAuth())
+                commit('setUser', null);
+                dispatch('toast/success', "You are logout successfully!", { root: true });
+            } catch(e) {
+                console.error('Cannot logout');
+            }
+        }
 	},
 
 	mutations: {

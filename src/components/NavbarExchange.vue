@@ -27,16 +27,18 @@
 							<li v-if="isAuthenticated" class="navbar-item">
 								{{user?.email}}
 							</li>
-							<li class="navbar-end__item" v-for="item in items" :key="item.text">
+							<li class="navbar-end__item" v-for="item in isLoginItems" :key="item.text">
 								<router-link class="navbar-item nav-home" :to="item.link">
 									{{ item.text }}
 								</router-link>
+							</li>
+							<li v-if="isAuthenticated" class="navbar-end__item">
+								<button @click="() => $store.dispatch('user/logout')" class="button is-block is-info is-fullwidth" type="button">Logout</button>
 							</li>
 						</ul>
 					</div>
 				</div>
 			</nav>
-			is Auth: {{ isAuthenticated }}
 		</header>
 		<!-- NAVBAR END -->
 	</div>
@@ -60,6 +62,17 @@ export default {
 	setup() {
 		const { isAuthenticated, user } = useAuth();
 		return { isAuthenticated, user };
+	},
+
+
+	computed: {
+		isLoginItems() {
+			if (this.isAuthenticated) {
+				return this.items.filter((item) => item.link !== '/login' && item.link !== '/register')
+			} else {
+				return this.items
+			}
+		}
 	},
 };
 </script>
