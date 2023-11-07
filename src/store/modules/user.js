@@ -5,7 +5,7 @@ import {
 	signOut,
 	signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { database } from '../../firebase/db';
 
@@ -117,7 +117,15 @@ export default {
 			} finally {
 				commit('setAuthIsProcessing', false);
 			}
-		}
+		},
+
+        async updateProfile({commit, dispatch}, {data, onSuccess}) {
+            const userRef = doc(database, "users", data.id)
+            await updateDoc(userRef, data)
+            commit("updateProfile", data)
+            dispatch('toast/success', `Profile has been updated!`, { root: true });
+            onSuccess()
+        }
 	},
 
 	mutations: {
@@ -131,6 +139,10 @@ export default {
 
 		setUser(state, user) {
 			state.data = user;
-		}
+		},
+
+        updateProfile(state, profile) {
+            state.data = {...state.data, profile}
+        }
 	},
 };

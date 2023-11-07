@@ -25,16 +25,33 @@
 					<div id="navbar-menu" class="navbar-menu">
 						<ul class="navbar-end">
 							<li v-if="isAuthenticated" class="navbar-item">
-								{{user?.email}}
+								{{ user?.email }}
 							</li>
-							<li class="navbar-end__item" v-for="item in isLoginItems" :key="item.text">
+							<li
+								class="navbar-end__item"
+								v-for="item in isLoginItems"
+								:key="item.text"
+							>
 								<router-link class="navbar-item nav-home" :to="item.link">
 									{{ item.text }}
 								</router-link>
 							</li>
-							<li v-if="isAuthenticated" class="navbar-end__item">
-								<button @click="() => $store.dispatch('user/logout')" class="button is-block is-info is-fullwidth" type="button">Logout</button>
-							</li>
+							<div v-if="isAuthenticated" style="display: flex;">
+								<li class="navbar-end__item">
+									<router-link class="navbar-item nav-home" to="/profile">
+										Profile
+									</router-link>
+								</li>
+								<li class="navbar-end__item">
+									<button
+										@click="() => $store.dispatch('user/logout')"
+										class="button is-block is-info is-fullwidth"
+										type="button"
+									>
+										Logout
+									</button>
+								</li>
+							</div>
 						</ul>
 					</div>
 				</div>
@@ -64,15 +81,16 @@ export default {
 		return { isAuthenticated, user };
 	},
 
-
 	computed: {
 		isLoginItems() {
 			if (this.isAuthenticated) {
-				return this.items.filter((item) => item.link !== '/login' && item.link !== '/register')
+				return this.items.filter(
+					(item) => item.link !== '/login' && item.link !== '/register',
+				);
 			} else {
-				return this.items
+				return this.items;
 			}
-		}
+		},
 	},
 };
 </script>
