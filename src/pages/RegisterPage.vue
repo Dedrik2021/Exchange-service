@@ -16,9 +16,7 @@
 									placeholder="Email"
 									autocomplete="email"
 								/>
-								<div class="form-error">
-									<div class="help is-danger">Invalid Value</div>
-								</div>
+								<form-errors :errors="v$.form.email.$errors" />
 							</div>
 						</div>
 						<div class="field">
@@ -31,6 +29,7 @@
 									type="text"
 									placeholder="Username"
 								/>
+								<form-errors :errors="v$.form.username.$errors" />
 							</div>
 						</div>
 						<div class="field">
@@ -44,6 +43,7 @@
 									placeholder="Password"
 									autocomplete="current-password"
 								/>
+								<form-errors :errors="v$.form.password.$errors" />
 							</div>
 						</div>
 						<div class="field">
@@ -56,6 +56,7 @@
 									type="password"
 									placeholder="Repeat the password"
 								/>
+								<form-errors :errors="v$.form.confirmPassword.$errors" />
 							</div>
 						</div>
 						<button
@@ -78,10 +79,17 @@
 
 <script>
 // import { mapState } from 'vuex';
+import { useVuelidate } from '@vuelidate/core';
+import { required, minLength, helpers, email, requiredUnless } from '@vuelidate/validators';
 
 import useAuth from '../composition/useAuth';
+import FormErrors from '@/components/FormErrors.vue';
 
 export default {
+	components: {
+		FormErrors,
+	},
+
 	data() {
 		return {
 			form: {
@@ -93,9 +101,40 @@ export default {
 		};
 	},
 
+	validations() {
+		return {
+			form: {
+				email: {
+					required: helpers.withMessage('Email cannot be empty!', required),
+					email: helpers.withMessage('Email is not valid!', email),
+				},
+				username: {
+					required: helpers.withMessage('UserName cannot be empty!', required),
+					minLength: helpers.withMessage(
+						'UserName length should be at least 5!',
+						minLength(5),
+					),
+				},
+				password: {
+					required: helpers.withMessage('Password cannot be empty!', required),
+					minLength: helpers.withMessage(
+						'Password length should be at least 10 and contain num and letters!',
+						minLength(10),
+					)
+				},
+				confirmPassword: {
+					requiredUnless: helpers.withMessage(
+						'The Repeat Password value must be equal to the Password value!',
+						requiredUnless(this.password)
+					),
+				},
+			},
+		};
+	},
+
 	setup() {
 		const { error, isProcessing, isAuthenticated } = useAuth();
-		return { error, isProcessing, isAuthenticated };
+		return { error, isProcessing, isAuthenticated, v$: useVuelidate() };
 	},
 
 	watch: {
@@ -110,13 +149,14 @@ export default {
 		// }
 
 		isAuthenticated(isAuth) {
-			if (isAuth) this.$route.push('/')
-		},	
+			if (isAuth) this.$route.push('/');
+		},
 	},
 
 	methods: {
-		register() {
-			this.$store.dispatch('user/register', this.form);
+		async register() {
+			const isValid = await this.v$.$validate();
+			if (isValid)  this.$store.dispatch('user/register', this.form);
 		},
 	},
 

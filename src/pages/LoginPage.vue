@@ -16,6 +16,7 @@
 									autofocus=""
 									autocomplete="email"
 								/>
+								<form-errors :errors="v$.form.email.$errors" />
 							</div>
 						</div>
 						<div class="field">
@@ -27,6 +28,7 @@
 									placeholder="Your Password"
 									autocomplete="current-password"
 								/>
+								<form-errors :errors="v$.form.password.$errors" />
 							</div>
 						</div>
 						<button
@@ -47,8 +49,17 @@
 	</div>
 </template>
 <script>
+import { useVuelidate } from '@vuelidate/core';
+import { required, helpers, email } from '@vuelidate/validators';
+
 import useAuth from '../composition/useAuth';
+import FormErrors from '@/components/FormErrors.vue';
+
 export default {
+	components: {
+		FormErrors,
+	},
+
 	data() {
 		return {
 			form: {
@@ -58,9 +69,23 @@ export default {
 		};
 	},
 
+	validations() {
+		return {
+			form: {
+				email: {
+					required: helpers.withMessage('Email cannot be empty!', required),
+					email: helpers.withMessage('Email is invalid!', email)
+				},
+				password: {
+					required: helpers.withMessage('Password cannot be empty!', required),
+				}
+			},
+		};
+	},
+
 	setup() {
 		const { error, isProcessing,  isAuthenticated} = useAuth();
-		return { error, isProcessing,  isAuthenticated};
+		return { error, isProcessing,  isAuthenticated, v$: useVuelidate()};
 	},
 
 	watch: {
@@ -80,8 +105,9 @@ export default {
 	},
 
 	methods: {
-		logIn() {
-			this.$store.dispatch('user/logIn', this.form);
+		async logIn() {
+			const isValidate = await this.v$.$validate()
+			if (isValidate) this.$store.dispatch('user/logIn', this.form);
 		},
 	},
 };
