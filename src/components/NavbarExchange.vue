@@ -5,12 +5,12 @@
 			<nav class="navbar" :class="$route.path === '/' ? '' : 'with-background'">
 				<div class="container">
 					<div class="navbar-brand">
-						<a
+						<router-link
 							class="navbar-item has-text-white is-size-2 has-text-weight-bold"
-							href="#"
+							to="/"
 						>
 							{{ title }}
-						</a>
+						</router-link>
 						<span
 							role="button"
 							tabindex="0"
@@ -37,6 +37,11 @@
 								</router-link>
 							</li>
 							<div v-if="isAuthenticated" style="display: flex;">
+								<li class="navbar-end__item">
+									<router-link class="navbar-item nav-home" to="/exchanges/new">
+										New Exchange
+									</router-link>
+								</li>
 								<li class="navbar-end__item">
 									<router-link class="navbar-item nav-home" to="/profile">
 										Profile
