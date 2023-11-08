@@ -5,7 +5,7 @@
 				<h3 class="title has-text-grey">Login</h3>
 				<p class="subtitle has-text-grey">Please login to proceed.</p>
 				<div class="box">
-					<form @submit="(e) => logIn(e)">
+					<form @submit.prevent="logIn">
 						<div class="field">
 							<div class="control">
 								<input
@@ -80,8 +80,7 @@ export default {
 	},
 
 	methods: {
-		logIn(e) {
-			e.preventDefault();
+		logIn() {
 			this.$store.dispatch('user/logIn', this.form);
 		},
 	},

@@ -4,7 +4,7 @@
 			<div class="column is-4 is-offset-4">
 				<h3 class="title has-text-grey">Register</h3>
 				<div class="box">
-					<form @submit="(e) => register(e)">
+					<form @submit.prevent="register">
 						<div class="field">
 							<div class="control">
 								<label for="email"></label>
@@ -115,8 +115,7 @@ export default {
 	},
 
 	methods: {
-		register(e) {
-			e.preventDefault();
+		register() {
 			this.$store.dispatch('user/register', this.form);
 		},
 	},
