@@ -42,12 +42,12 @@
 						<label class="label">Image Link</label>
 						<div class="control">
 							<input
-								v-model="form.imageUrl"
+								v-model="form.image"
 								class="input"
 								type="text"
 								placeholder="https://unsplash...."
 							/>
-							<form-errors :errors="v$.form.imageUrl.$errors" />
+							<form-errors :errors="v$.form.image.$errors" />
 						</div>
 					</div>
 					<div class="field">
@@ -56,7 +56,7 @@
 							<input
 								v-model="form.price"
 								class="input"
-								type="number"
+								type="text"
 								placeholder="249"
 							/>
 							<form-errors :errors="v$.form.price.$errors" />
@@ -91,7 +91,22 @@
 					<div class="field">
 						<label class="label">Tags</label>
 						<div class="control">
-							<input class="input" type="text" placeholder="programming" />
+							<input
+								@input="handleTags"
+								class="input"
+								type="text"
+								placeholder="programming. Type and push the ','"
+							/>
+							<form-errors :errors="v$.form.tags.$errors" />
+							<ul v-if="form.tags.length">
+								<li
+									class="tag is-primary is-medium"
+									v-for="tag in form.tags"
+									:key="tag"
+								>
+									{{ tag }}
+								</li>
+							</ul>
 						</div>
 					</div>
 					<div class="field is-grouped">
@@ -110,11 +125,24 @@
 
 <script>
 import { useVuelidate } from '@vuelidate/core';
-import { required, minLength, minValue, helpers } from '@vuelidate/validators';
+import { required, minLength, minValue, helpers, numeric } from '@vuelidate/validators';
 
 import useAuth from '@/composition/useAuth';
 import FormErrors from '@/components/FormErrors.vue';
-import {supportedFileType} from '@/helpers/validators'
+import { supportedFileType } from '@/helpers/validators';
+
+const setupInitialData = () => {
+	return {
+		type: 'product',
+		title: '',
+		descr: '',
+		image: '',
+		price: null,
+		country: '',
+		city: '',
+		tags: [],
+	};
+};
 
 export default {
 	components: {
@@ -123,16 +151,7 @@ export default {
 
 	data() {
 		return {
-			form: {
-				type: 'product',
-				title: '',
-				descr: '',
-				imageUrl: '',
-				price: null,
-				country: '',
-				city: '',
-				tags: [{ tag: '' }],
-			},
+			form: setupInitialData(),
 		};
 	},
 
@@ -153,17 +172,24 @@ export default {
 				imageUrl: {
 					required: helpers.withMessage('Image cannot be empty!', required),
 					// url,
-                    supportedFileType: helpers.withMessage('The Image value is not a valid URL address!', supportedFileType)
+					supportedFileType: helpers.withMessage(
+						'The Image value is not a valid URL address!',
+						supportedFileType,
+					),
 				},
 
 				price: {
 					required: helpers.withMessage('Price cannot be empty!', required),
 					minValue: minValue(1),
+                    numeric: helpers.withMessage(
+						'Price field must be contain number signs!',
+						numeric,
+					),
 				},
 
 				country: { required: helpers.withMessage('Country cannot be empty!', required) },
 				city: { required: helpers.withMessage('City cannot be empty!', required) },
-				tags: { required },
+				tags: { required: helpers.withMessage('Tags cannot be empty!', required) },
 			},
 		};
 	},
@@ -183,7 +209,32 @@ export default {
 		async createExchange() {
 			const isValid = await this.v$.$validate();
 
-			if (isValid) console.log(this.form);
+			if (isValid) {
+                this.v$.$reset()
+				this.$store.dispatch('exchange/createExchange', {
+					data: this.form,
+					onSuccess: () => {
+						this.form = setupInitialData();
+					},
+				});
+			}
+		},
+
+		handleTags(e) {
+			const { value } = e.target;
+
+			if (
+				value &&
+				value.trim().length > 1 &&
+				(value.substr(-1) === ',' || value.substr(-1) === ' ')
+			) {
+				const _value = value.split(',')[0].trim();
+
+				if (!this.form.tags.includes(_value)) {
+					this.form.tags.push(_value);
+				}
+				e.target.value = '';
+			}
 		},
 	},
 };
