@@ -80,7 +80,7 @@
 <script>
 // import { mapState } from 'vuex';
 import { useVuelidate } from '@vuelidate/core';
-import { required, minLength, helpers, email, requiredUnless } from '@vuelidate/validators';
+import { required, minLength, helpers, email, sameAs } from '@vuelidate/validators';
 
 import useAuth from '../composition/useAuth';
 import FormErrors from '@/components/FormErrors.vue';
@@ -120,12 +120,13 @@ export default {
 					minLength: helpers.withMessage(
 						'Password length should be at least 10 and contain num and letters!',
 						minLength(10),
-					)
+					),
 				},
 				confirmPassword: {
-					requiredUnless: helpers.withMessage(
+					required: helpers.withMessage('Password cannot be empty!', required),
+					sameAs: helpers.withMessage(
 						'The Repeat Password value must be equal to the Password value!',
-						requiredUnless(this.password)
+						sameAs(this.form.password),
 					),
 				},
 			},
@@ -156,7 +157,7 @@ export default {
 	methods: {
 		async register() {
 			const isValid = await this.v$.$validate();
-			if (isValid)  this.$store.dispatch('user/register', this.form);
+			if (isValid) this.$store.dispatch('user/register', this.form);
 		},
 	},
 

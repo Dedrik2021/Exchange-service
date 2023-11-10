@@ -125,11 +125,10 @@
 
 <script>
 import { useVuelidate } from '@vuelidate/core';
-import { required, minLength, minValue, helpers, numeric } from '@vuelidate/validators';
+import { required, minLength, minValue, helpers, numeric, url } from '@vuelidate/validators';
 
 import useAuth from '@/composition/useAuth';
 import FormErrors from '@/components/FormErrors.vue';
-import { supportedFileType } from '@/helpers/validators';
 
 const setupInitialData = () => {
 	return {
@@ -169,13 +168,9 @@ export default {
 
 				descr: { required: helpers.withMessage('Description cannot be empty!', required) },
 
-				imageUrl: {
+				image: {
 					required: helpers.withMessage('Image cannot be empty!', required),
-					// url,
-					supportedFileType: helpers.withMessage(
-						'The Image value is not a valid URL address!',
-						supportedFileType,
-					),
+					url: helpers.withMessage('The Image value is not a valid URL address!', url),
 				},
 
 				price: {

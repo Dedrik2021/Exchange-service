@@ -57,10 +57,9 @@
 
 <script>
 import { useVuelidate } from '@vuelidate/core';
-import { required, helpers, numeric, minLength, maxLength } from '@vuelidate/validators';
+import { required, helpers, numeric, minLength, maxLength, url } from '@vuelidate/validators';
 
 import FormErrors from './FormErrors.vue';
-import { supportedFileType } from '@/helpers/validators';
 
 export default {
 	components: {
@@ -93,9 +92,9 @@ export default {
 				},
 				avatar: {
 					required: helpers.withMessage('Image cannot be empty!', required),
-					supportedFileType: helpers.withMessage(
+					url: helpers.withMessage(
 						'The Image field value is not a valid URL address!',
-						supportedFileType,
+						url,
 					),
 				},
 				info: {
