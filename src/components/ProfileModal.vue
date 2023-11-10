@@ -1,58 +1,42 @@
 <template>
-	<div>
-		<button @click="isOpen = true" class="button is-block is-success is-light is-fullwidth">
-			Update Info
-		</button>
-		<div :class="['modal', { 'is-active': isOpen }]">
-			<div class="modal-background"></div>
-			<div class="modal-card">
-				<header class="modal-card-head">
-					<p class="modal-card-title">User Profile</p>
-					<button @click="isOpen = false" class="delete" aria-label="close"></button>
-				</header>
-				<section class="modal-card-body">
-					<form>
-						<div class="field">
-							<label class="title">Username</label>
-							<input class="input" v-model="userProfile.username" />
-							<form-errors :errors="v$.userProfile.username.$errors" />
-						</div>
-						<div class="field">
-							<label class="title">Avatar</label>
-							<input class="input" v-model="userProfile.avatar" />
-							<form-errors :errors="v$.userProfile.avatar.$errors" />
-						</div>
-						<div class="field">
-							<label class="title">Info about user</label>
-							<input class="input" v-model="userProfile.info" />
-							<form-errors :errors="v$.userProfile.info.$errors" />
-						</div>
-						<div class="field">
-							<label class="title">Address</label>
-							<input class="input" v-model="userProfile.address" />
-							<form-errors :errors="v$.userProfile.address.$errors" />
-						</div>
-						<div class="field">
-							<label class="title">Country</label>
-							<input class="input" v-model="userProfile.country" />
-							<form-errors :errors="v$.userProfile.country.$errors" />
-						</div>
-						<div class="field">
-							<label class="title">Phone</label>
-							<input class="input" v-model="userProfile.phone" />
-							<form-errors :errors="v$.userProfile.phone.$errors" />
-						</div>
-					</form>
-				</section>
-				<footer class="modal-card-foot">
-					<button @click="updateProfile" type="button" class="button is-success">
-						Save changes
-					</button>
-					<button @click="isOpen = false" class="button">Cancel</button>
-				</footer>
+	<modal-exchange :onModalSubmit="updateProfile" ref="modalExchange">
+		<form>
+			<div class="field">
+				<label class="title">Username</label>
+				<input class="input" v-model="userProfile.username" />
+				<form-errors :errors="v$.userProfile.username.$errors" />
 			</div>
-		</div>
-	</div>
+			<div class="field">
+				<label class="title">Avatar</label>
+				<input class="input" v-model="userProfile.avatar" />
+				<form-errors :errors="v$.userProfile.avatar.$errors" />
+			</div>
+			<div class="field">
+				<label class="title">Info about user</label>
+				<input class="input" v-model="userProfile.info" />
+				<form-errors :errors="v$.userProfile.info.$errors" />
+			</div>
+			<div class="field">
+				<label class="title">Address</label>
+				<input class="input" v-model="userProfile.address" />
+				<form-errors :errors="v$.userProfile.address.$errors" />
+			</div>
+			<div class="field">
+				<label class="title">Country</label>
+				<input class="input" v-model="userProfile.country" />
+				<form-errors :errors="v$.userProfile.country.$errors" />
+			</div>
+			<div class="field">
+				<label class="title">Phone</label>
+				<input class="input" v-model="userProfile.phone" />
+				<form-errors :errors="v$.userProfile.phone.$errors" />
+			</div>
+		</form>
+
+		<template #activator>
+			<button class="button is-block is-primary is-light is-fullwidth">Custom Button</button>
+		</template>
+	</modal-exchange>
 </template>
 
 <script>
@@ -60,10 +44,12 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers, numeric, minLength, maxLength, url } from '@vuelidate/validators';
 
 import FormErrors from './FormErrors.vue';
+import ModalExchange from './ModalExchange.vue';
 
 export default {
 	components: {
 		FormErrors,
+		ModalExchange,
 	},
 
 	props: {
@@ -79,7 +65,6 @@ export default {
 
 	data() {
 		return {
-			isOpen: false,
 			userProfile: { ...this.user },
 		};
 	},
@@ -125,6 +110,12 @@ export default {
 		};
 	},
 
+    computed: {
+        modal() {
+            return this.$refs.modalExchange
+        }
+    },
+
 	methods: {
 		async updateProfile() {
 			const isValid = await this.v$.$validate();
@@ -132,7 +123,7 @@ export default {
 			if (isValid) {
 				this.$store.dispatch('user/updateProfile', {
 					data: this.userProfile,
-					onSuccess: () => (this.isOpen = false),
+					onSuccess: () => this.modal.closeModal()
 				});
 			}
 		},

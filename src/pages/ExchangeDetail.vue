@@ -48,6 +48,7 @@
 										>
 											Make a deal
 										</button>
+                                        <modal-exchange/>
 										<div class="content">
 											<ul class="m-t-none">
 												<li>Get item today</li>
@@ -86,7 +87,13 @@
 </template>
 
 <script>
+
+
 export default {
+    components: {
+        
+    },
+
     created() {
         const {slug} = this.$route.params
         this.$store.dispatch('exchange/getExchangeBySlug', slug)

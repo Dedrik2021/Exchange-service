@@ -35,8 +35,11 @@ export default {
 		},
 
 		async createExchange({ rootState, dispatch }, { data, onSuccess }) {
+            //find user from users db
 			const userRef = doc(database, 'users', rootState.user.data.id);
+            //write user into data
 			data.user = userRef;
+            //create slug and write into data
 			data.slug = slugify(`${data.title} ${Date.now()}`, {
 				lower: true,
 				strict: true,
@@ -49,6 +52,7 @@ export default {
 
 		async getExchangeBySlug({ commit }, slug) {
 			commit('setExchange', {});
+            //find exchange from exchanges db by slug
 			const docQuery = query(collection(database, 'exchanges'), where('slug', '==', slug));
 			const querySnapshot = await getDocs(docQuery);
 			const exchange = querySnapshot.docs[0].data();
