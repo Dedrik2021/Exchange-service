@@ -69,7 +69,7 @@
 								v-model="form.country"
 								class="input"
 								type="text"
-								placeholder="Slovakia"
+								placeholder="Austria"
 							/>
 							<form-errors :errors="v$.form.country.$errors" />
 						</div>
@@ -81,7 +81,7 @@
 								v-model="form.city"
 								class="input"
 								type="text"
-								placeholder="Bratislava"
+								placeholder="Wien"
 							/>
 							<form-errors :errors="v$.form.city.$errors" />
 						</div>
@@ -161,8 +161,8 @@ export default {
 				title: {
 					myCustomRequired: helpers.withMessage('Title cannot be empty!', required),
 					minLength: helpers.withMessage(
-						'Title length should be at least 10!',
-						minLength(10),
+						'Title length should be at least 5!',
+						minLength(5),
 					),
 				},
 

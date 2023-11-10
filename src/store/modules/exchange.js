@@ -1,41 +1,74 @@
-import {getDocs, collectionGroup, query, doc, addDoc, collection} from 'firebase/firestore'
+import {
+	getDocs,
+	getDoc,
+	collectionGroup,
+	query,
+	doc,
+	addDoc,
+	collection,
+	where,
+} from 'firebase/firestore';
+import slugify from 'slugify';
 
-import {database} from '../../firebase/db'
+import { database } from '../../firebase/db';
 
 export default {
-    namespaced: true,
+	namespaced: true,
 
 	state() {
 		return {
-			items: []
+			items: [],
+			item: {},
 		};
 	},
 
-    actions: {
-        async getExchanges({commit}) {
-            const exchangesQuery = query(collectionGroup(database, 'exchanges'))
-            const snapshot = await getDocs(exchangesQuery)
+	actions: {
+		async getExchanges({ commit }) {
+			const exchangesQuery = query(collectionGroup(database, 'exchanges'));
+			const snapshot = await getDocs(exchangesQuery);
 
-            const exchanges = snapshot.docs.map((doc) => {
-                return {id: doc.id, ...doc.data()}
-            })
+			const exchanges = snapshot.docs.map((doc) => {
+				return { id: doc.id, ...doc.data() };
+			});
 
-            commit('setExchanges', exchanges)
-        },
+			commit('setExchanges', exchanges);
+		},
 
-        async createExchange({rootState, dispatch}, {data, onSuccess}) {
-            const userRef = doc(database, "users", rootState.user.data.id)
-            data.user = userRef
-            await addDoc(collection(database, "exchanges"), data)
-            dispatch("toast/success", "Exchange was created succesfuly!", {root: true})
+		async createExchange({ rootState, dispatch }, { data, onSuccess }) {
+			const userRef = doc(database, 'users', rootState.user.data.id);
+			data.user = userRef;
+			data.slug = slugify(`${data.title} ${Date.now()}`, {
+				lower: true,
+				strict: true,
+			});
+			await addDoc(collection(database, 'exchanges'), data);
+			dispatch('toast/success', 'Exchange was created succesfuly!', { root: true });
 
-            onSuccess()
-        }
-    },
+			onSuccess();
+		},
 
-    mutations: {
-        setExchanges(state, exchanges) {
-            state.items = exchanges
-        }
-    }
+		async getExchangeBySlug({ commit }, slug) {
+			commit('setExchange', {});
+			const docQuery = query(collection(database, 'exchanges'), where('slug', '==', slug));
+			const querySnapshot = await getDocs(docQuery);
+			const exchange = querySnapshot.docs[0].data();
+
+            //find user from users db
+            const userSnap = await getDoc(exchange.user)
+            exchange.user = userSnap.data()
+            exchange.user.id = userSnap.id
+
+			commit('setExchange', exchange);
+		},
+	},
+
+	mutations: {
+		setExchanges(state, exchanges) {
+			state.items = exchanges;
+		},
+
+		setExchange(state, exchange) {
+			state.item = exchange;
+		},
+	},
 };

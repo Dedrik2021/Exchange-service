@@ -10,20 +10,14 @@
 					:key="item.id"
 				>
 					<div class="item post-card bottom-border">
-						<a class="item-link" href="#">
-							<figure
-								class="image is-2by1 item-figure background-img"
-								:style="{
-									'background-image': `url(${item.image})`,
-								}"
-								:alt="item.title"
-							></figure>
+						<router-link class="item-link" :to="{name: 'ExchangeDetail', params: {slug: item.slug}}">
+							<img class="post-card__image" width="426" height="213" :src="item.image" :alt="item.title">
 							<div class="item-featured">
 								<div class="exchange-icon">
 									<font-awesome-icon icon="star" />
 								</div>
 							</div>
-						</a>
+						</router-link>
 						<div class="item-tags">
 							<a
 								class="button is-rounded"
@@ -35,7 +29,7 @@
 							</a>
 						</div>
 						<h2 class="title item-title is-size-4 has-text-weight-extra-bold">
-							<a class="item-link" href="#">{{ item.title }}</a>
+							<router-link :to="{name: 'ExchangeDetail', params: {slug: item.slug}}" class="item-link" >{{ item.title }}</router-link>
 						</h2>
 						<div class="level">
 							<div class="level-left">
@@ -71,6 +65,11 @@ export default {
 	font-size: 34px;
 	margin-bottom: 10px;
 	font-weight: bold;
+}
+
+.post-card__image {
+	height: 213px;
+	object-fit: cover;
 }
 
 .exchange-icon {
