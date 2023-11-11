@@ -12,14 +12,13 @@
 							<div class="user-tile" v-if="!!exchangeUser">
 								<div class="user-tile-image">
 									<figure class="image is-64x64">
-										<img
-											class="is-rounded"
-											:src="exchangeUser.avatar"
-										/>
+										<img class="is-rounded" :src="exchangeUser.avatar" />
 									</figure>
 								</div>
 								<div class="user-tile-author center">
-									<h3 class="user-tile-author-name">by {{ exchangeUser.username }}</h3>
+									<h3 class="user-tile-author-name">
+										by {{ exchangeUser.username }}
+									</h3>
 								</div>
 							</div>
 							<!-- Exchange User End -->
@@ -30,25 +29,33 @@
 									<div class="card-image">
 										<figure class="image is-4by2">
 											<!-- Exchange Image -->
-											<img
-												:src="exchange.image"
-												:alt="exchange.title"
-											/>
+											<img :src="exchange.image" :alt="exchange.title" />
 										</figure>
 									</div>
 									<div class="card-content">
 										<div class="content m-b-sm">
 											<div class="media-content">
-												<span class="title is-2">$ {{ exchange.price }}</span>
+												<span class="title is-2"
+													>$ {{ exchange.price }}</span
+												>
 											</div>
 										</div>
-										<button
-											type="button"
-											class="button is-block is-success is-light is-fullwidth"
+										<exchange-deal-modal
+											:availableExchanges="userExchanges"
+											:exchange="exchange"
+											v-if="canCreateExchange"
+										/>
+										<modal-exchange />
+										<div v-if="isExchangeOwner" disabled class="button is-fullwidth is-large is-danger is-outlined">
+											Yours Exchange
+										</div>
+										<router-link
+											v-if="!isAuth"
+											class="button is-fullwidth is-large is-success is-outlined"
+											to="/login"
 										>
-											Make a deal
-										</button>
-                                        <modal-exchange/>
+											Login to make an offer
+										</router-link>
 										<div class="content">
 											<ul class="m-t-none">
 												<li>Get item today</li>
@@ -87,31 +94,58 @@
 </template>
 
 <script>
-
+import ExchangeDealModal from '@/components/ExchangeDealModal.vue';
 
 export default {
-    components: {
-        
-    },
+	components: {
+		ExchangeDealModal,
+	},
 
-    created() {
-        const {slug} = this.$route.params
-        this.$store.dispatch('exchange/getExchangeBySlug', slug)
-    },
+	created() {
+		const { slug } = this.$route.params;
+		this.$store.dispatch('exchange/getExchangeBySlug', slug);
+	},
 
-    computed: {
-        exchange() {
-            return this.$store.state.exchange.item
-        },
+	computed: {
+		user() {
+			return this.$store.state.user.data;
+		},
 
-        exchangeUser() {
-            return this.exchange.user
-        }
-    }
+		isAuth() {
+			return this.$store.getters['user/isAuthenticated'];
+		},
+
+		exchange() {
+			return this.$store.state.exchange.item;
+		},
+
+		exchangeUser() {
+			return this.exchange.user;
+		},
+
+		userExchanges() {
+			return this.user?.exchanges || [];
+		},
+
+		isExchangeOwner() {
+			return this.$store.getters['user/isExchangeOwner'](this.exchangeUser.id);
+		},
+
+		canCreateExchange() {
+			return this.isAuth && !this.isExchangeOwner;
+		},
+	},
 };
 </script>
 
 <style scoped lang="scss">
+.card-image {
+	& img {
+		height: 213px;
+		width: 320px;
+		object-fit: fill;
+	}
+}
 // CARD
 .card {
 	z-index: 9999;

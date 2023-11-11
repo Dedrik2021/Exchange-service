@@ -19,7 +19,7 @@
 				<slot/>
 				</section>
 				<footer class="modal-card-foot">
-					<button @click="submitModal" type="button" class="button is-success">
+					<button :disabled="isDisabled" @click="submitModal" type="button" class="button is-success">
 						Save changes
 					</button>
 					<button @click="closeModal" class="button">Cancel</button>
@@ -35,6 +35,11 @@ export default {
 		onModalSubmit: {
 			type: Function,
 			required: false
+		},
+
+		isDisabled: {
+			type: Boolean,
+			default: false
 		}
 	},
 

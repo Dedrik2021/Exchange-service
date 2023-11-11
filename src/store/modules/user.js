@@ -5,7 +5,16 @@ import {
 	signOut,
 	signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import {
+	doc,
+	setDoc,
+	getDoc,
+	updateDoc,
+	collection,
+	query,
+	where,
+	getDocs,
+} from 'firebase/firestore';
 
 import { database } from '../../firebase/db';
 
@@ -14,11 +23,11 @@ export default {
 
 	state() {
 		return {
-            data: null,
+			data: null,
 			auth: {
-                isProcessing: false,
+				isProcessing: false,
 				error: '',
-			}
+			},
 		};
 	},
 
@@ -26,21 +35,31 @@ export default {
 		isAuthenticated(state) {
 			return !!state.data;
 		},
+
+		isExchangeOwner: (state) => {
+			return (exchangeUserId) => {
+				return (
+					state.data &&
+					exchangeUserId &&
+					state.data.id === exchangeUserId
+				)
+			}
+		}
 	},
 
 	actions: {
 		onAuthChange({ dispatch, commit }, callback) {
-            commit("setAuthIsProcessing", true)
+			commit('setAuthIsProcessing', true);
 
 			onAuthStateChanged(getAuth(), async (user) => {
 				if (user) {
 					await dispatch('getUserProfile', user);
-                    commit("setAuthIsProcessing", false)
-                    callback(user)
+					commit('setAuthIsProcessing', false);
+					callback(user);
 				} else {
 					console.log('Logged out');
-                    commit("setAuthIsProcessing", false)
-                    callback(null)
+					commit('setAuthIsProcessing', false);
+					callback(null);
 				}
 			});
 		},
@@ -49,10 +68,16 @@ export default {
 			const docRef = doc(database, 'users', user.uid);
 			const docSnap = await getDoc(docRef);
 			const userProfile = docSnap.data();
+
+			const docQuuery = query(collection(database, 'exchanges'), where('user', '==', docRef));
+			const querySnap = await getDocs(docQuuery)
+			const exchanges = querySnap.docs.map(doc => doc.data())
+
 			const useWithProfile = {
 				id: user.uid,
 				email: user.email,
 				...userProfile,
+				exchanges
 			};
 			commit('setUser', useWithProfile);
 		},
@@ -103,7 +128,7 @@ export default {
 			}
 		},
 
-		async logIn({commit, dispatch}, { email, password }) {
+		async logIn({ commit, dispatch }, { email, password }) {
 			commit('setAuthIsProcessing', true);
 			commit('setAuthError', '');
 
@@ -119,13 +144,13 @@ export default {
 			}
 		},
 
-        async updateProfile({commit, dispatch}, {data, onSuccess}) {
-            const userRef = doc(database, "users", data.id)
-            await updateDoc(userRef, data)
-            commit("updateProfile", data)
-            dispatch('toast/success', `Profile has been updated!`, { root: true });
-            onSuccess()
-        }
+		async updateProfile({ commit, dispatch }, { data, onSuccess }) {
+			const userRef = doc(database, 'users', data.id);
+			await updateDoc(userRef, data);
+			commit('updateProfile', data);
+			dispatch('toast/success', `Profile has been updated!`, { root: true });
+			onSuccess();
+		},
 	},
 
 	mutations: {
@@ -141,8 +166,8 @@ export default {
 			state.data = user;
 		},
 
-        updateProfile(state, profile) {
-            state.data = {...state.data, profile}
-        }
+		updateProfile(state, profile) {
+			state.data = { ...state.data, profile };
+		},
 	},
 };
