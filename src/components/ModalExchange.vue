@@ -52,7 +52,7 @@ export default {
 	methods: {
 		submitModal() {
 			this.onModalSubmit({
-				onSuccess: () => this.closeModal,
+				onSuccess: () => this.closeModal(),
 			})
 		},
 

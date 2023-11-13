@@ -56,6 +56,7 @@ export default {
 			const docQuery = query(collection(database, 'exchanges'), where('slug', '==', slug));
 			const querySnapshot = await getDocs(docQuery);
 			const exchange = querySnapshot.docs[0].data();
+			exchange.id = querySnapshot.docs[0].id
 
             //find user from users db
             const userSnap = await getDoc(exchange.user)
