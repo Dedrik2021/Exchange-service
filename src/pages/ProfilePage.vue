@@ -6,16 +6,16 @@
 					<div class="columns is-mobile is-multiline">
 						<div class="column is-2">
 							<figure class="image header-icon user-profile-image">
-								<img class="is-rounded" :src="user.avatar" />
+								<img class="is-rounded" :src="user?.avatar" />
 							</figure>
 						</div>
 						<div class="column is-4-tablet is-10-mobile name">
 							<div class="user-info">
 								<p>
-									<span class="title is-bold">{{ user.username }}</span>
+									<span class="title is-bold">{{ user?.username }}</span>
 									<br />
 								</p>
-								<p class="tagline">{{ user.info }}</p>
+								<p class="tagline">{{ user?.info }}</p>
 							</div>
 							<profile-modal :user="user" />
 						</div>
@@ -23,16 +23,16 @@
 							class="stats-tab stats-tab-interactive column is-2-tablet is-4-mobile has-text-centered"
 						>
 							<p class="stat-val">Received</p>
-							<p class="stat-key">Opportunities</p>
+							<p class="stat-key">{{ opportunities.length }} Opportunities </p>
 						</div>
 						<div
 							class="stats-tab stats-tab-interactive column is-2-tablet is-4-mobile has-text-centered"
 						>
 							<p class="stat-val">Sent</p>
-							<p class="stat-key">Opportunities</p>
+							<p class="stat-key">Opportunities </p>
 						</div>
 						<div class="stats-tab column is-2-tablet is-4-mobile has-text-centered">
-							<p class="stat-val">{{ user.credit }}</p>
+							<p class="stat-val">{{ user?.credit }}</p>
 							<p class="stat-key">Credits</p>
 						</div>
 					</div>
@@ -100,7 +100,21 @@ export default {
 		isAuthenticated(isAuth) {
 			if (!isAuth) this.$router.push('/')
 		},	
+
+		created() {
+			this.$store.dispatch("opportunity/getOpportunities")
+		}
 	},
+
+	computed: {
+		opportunities() {
+			return this.$store.state.opportunity.opportunities
+		},
+
+		created() {
+			return this.$store.dispatch("opportunity/getOpportunities")
+		}
+	}
 };
 </script>
 
