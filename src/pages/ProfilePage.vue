@@ -20,16 +20,20 @@
 							<profile-modal :user="user" />
 						</div>
 						<div
-							class="stats-tab stats-tab-interactive column is-2-tablet is-4-mobile has-text-centered"
+							@click="selectedOpportunities = 'received'"
+							:class="{'is-active': selectedOpportunities === 'received'}"
+							class=" stats-tab stats-tab-interactive column is-2-tablet is-4-mobile has-text-centered"
 						>
 							<p class="stat-val">Received</p>
-							<p class="stat-key">{{ opportunities.length }} Opportunities </p>
+							<p class="stat-key">{{ opportunities.length }} Opportunities</p>
 						</div>
 						<div
+							@click="selectedOpportunities = 'sent'"
+							:class="{'is-active': selectedOpportunities === 'sent'}"
 							class="stats-tab stats-tab-interactive column is-2-tablet is-4-mobile has-text-centered"
 						>
-							<p class="stat-val">Sent</p>
-							<p class="stat-key">Opportunities </p>
+							<p class="stat-val">Sent </p>
+							<p class="stat-key"> {{ sendOpportunities.length }} Opportunities</p>
 						</div>
 						<div class="stats-tab column is-2-tablet is-4-mobile has-text-centered">
 							<p class="stat-val">{{ user?.credit }}</p>
@@ -37,45 +41,11 @@
 						</div>
 					</div>
 				</div>
-				<div class="columns is-mobile is-multiline">
-					<template v-if="true">
-						<div class="column is-3-tablet is-6-mobile">
-							<div class="card">
-								<div class="card-image">
-									<figure class="image is-4by3">
-										<img src="http://via.placeholder.com/400x400" />
-									</figure>
-								</div>
-								<div class="card-content">
-									<div class="media">
-										<div class="media-content">
-											<p class="title is-6 mb-2"><b>Offer:</b> 1000$</p>
-											<p class="title is-6">
-												<b>Request:</b> Programming Lessons
-											</p>
-											<p class="subtitle is-6">
-												<span class="tag is-dark subtitle">Pending</span>
-											</p>
-										</div>
-									</div>
-									<div class="content">
-										<p>
-											User wants to exchange your item thorugh money exchange
-										</p>
-									</div>
-								</div>
-								<footer class="card-footer">
-									<button
-										type="button"
-										class="button is-block is-success is-light is-fullwidth"
-									>
-										Check deal
-									</button>
-								</footer>
-							</div>
-							<br />
-						</div>
-					</template>
+				<div v-if="selectedOpportunities === 'received'" class="columns is-mobile is-multiline">
+					<opportunities-card :opportunities="opportunities" />
+				</div>
+				<div v-if="selectedOpportunities === 'sent'" class="columns is-mobile is-multiline">
+					<opportunities-card :opportunities="sendOpportunities" />
 				</div>
 			</div>
 		</div>
@@ -85,36 +55,56 @@
 <script>
 import useAuth from '@/composition/useAuth';
 import ProfileModal from '@/components/ProfileModal.vue';
+import OpportunitiesCard from '@/components/OpportunitiesCard.vue';
 
 export default {
-    components: {
-        ProfileModal
-    },  
+	components: {
+		ProfileModal,
+		OpportunitiesCard
+	},
 
-    setup() {
-		const { isProcessing,  isAuthenticated, user} = useAuth();
-		return { isProcessing,  isAuthenticated, user};
+	data() {
+		return {
+			selectedOpportunities: "received"
+		}
+	},
+
+	setup() {
+		const { isProcessing, isAuthenticated, user } = useAuth();
+		return { isProcessing, isAuthenticated, user };
 	},
 
 	watch: {
 		isAuthenticated(isAuth) {
-			if (!isAuth) this.$router.push('/')
-		},	
-
-		created() {
-			this.$store.dispatch("opportunity/getOpportunities")
-		}
-	},
-
-	computed: {
-		opportunities() {
-			return this.$store.state.opportunity.opportunities
+			if (!isAuth) this.$router.push('/');
 		},
 
 		created() {
-			return this.$store.dispatch("opportunity/getOpportunities")
-		}
-	}
+			this.$store.dispatch('opportunity/getOpportunities');
+		},
+
+		createdOpportunity() {
+			this.$store.dispatch('opportunity/getSendOpportunities');
+		},
+	},
+
+	computed: {
+		sendOpportunities() {
+			return this.$store.state.opportunity.sendOpportunities; 
+		},
+
+		opportunities() {
+			return this.$store.state.opportunity.opportunities;
+		},
+
+		created() {
+			return this.$store.dispatch('opportunity/getOpportunities');
+		},
+
+		createdOpportunity() {
+			return this.$store.dispatch('opportunity/getSendOpportunities');
+		},
+	},
 };
 </script>
 

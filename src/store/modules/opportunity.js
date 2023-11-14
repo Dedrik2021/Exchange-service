@@ -1,16 +1,42 @@
-import { Timestamp, doc, addDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import {
+	Timestamp,
+	doc,
+	addDoc,
+	collection,
+	query,
+	where,
+	getDocs,
+	getDoc,
+} from 'firebase/firestore';
 
 import { database } from '@/firebase/db';
+
+const extraDataForOpportunity = async (opportunity, id) => {
+	if (opportunity.fromExchangeId) {
+		const formExchangeDoc = await getDoc(opportunity.fromExchangeId);
+		opportunity.fromExchangeId = { ...formExchangeDoc.data(), id: formExchangeDoc.id };
+	}
+
+	const toExchangeDoc = await getDoc(opportunity.toExchange);
+	opportunity.toExchange = { ...toExchangeDoc.data(), id: toExchangeDoc.id };
+
+	const fromUserDoc = await getDoc(opportunity.fromUser);
+	opportunity.fromUser = { ...fromUserDoc.data(), id: fromUserDoc.id };
+
+    opportunity.id = id
+
+	return opportunity;
+};
 
 export default {
 	namespaced: true,
 
-    state() {
-        return {
-            opportunities: [],
-            sendOpportunities: []
-        }
-    },
+	state() {
+		return {
+			opportunities: [],
+			sendOpportunities: [],
+		};
+	},
 
 	actions: {
 		async getOpportunities({ rootState, dispatch, commit }) {
@@ -26,8 +52,29 @@ export default {
 			);
 
 			const opportunitiesSnap = await getDocs(opportunityQuery);
-			const opportunities = opportunitiesSnap.docs.map(doc => ({...doc.data(), id: doc.id}))
-            commit('setOpportunities', {resource: "opportunities", opportunities})
+			const opportunities = await Promise.all(opportunitiesSnap.docs.map(
+				(doc) => (extraDataForOpportunity(doc.data(), doc.id)),
+			));
+			commit('setOpportunities', { resource: 'opportunities', opportunities });
+		},
+
+		async getSendOpportunities({ rootState, dispatch, commit }) {
+			const id = rootState.user.data.id;
+
+			if (!id) {
+				dispatch('toast/error', 'User is not logged in', { root: true });
+			}
+
+			const opportunityQuery = query(
+				collection(database, 'opportunities'),
+				where('fromUser', '==', doc(database, 'users', id)),
+			);
+
+			const opportunitiesSnap = await getDocs(opportunityQuery);
+			const opportunities = await Promise.all(opportunitiesSnap.docs.map(
+				(doc) => (extraDataForOpportunity(doc.data(), doc.id)),
+			));
+			commit('setOpportunities', { resource: 'sendOpportunities', opportunities });
 		},
 
 		async createOpportunity({ dispatch }, { data, onSuccess }) {
@@ -37,6 +84,7 @@ export default {
 				toUser: doc(database, 'users', data.toUserId),
 				fromUser: doc(database, 'users', data.formUserId),
 				toExchange: doc(database, 'exchanges', data.toExchangeId),
+                status: 'pending'
 			};
 
 			if (data.formExchangeId) {
@@ -52,9 +100,9 @@ export default {
 		},
 	},
 
-    mutations: {
-        setOpportunities(state, {resource, opportunities}) {
-            state[resource] = opportunities
-        }
-    }
+	mutations: {
+		setOpportunities(state, { resource, opportunities }) {
+			state[resource] = opportunities;
+		},
+	},
 };
