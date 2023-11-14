@@ -34,7 +34,7 @@
 		</form>
 
 		<template #activator>
-			<button class="button is-block is-primary is-light is-fullwidth">Custom Button</button>
+			<button class="button is-block is-primary is-light is-fullwidth">Update Profile</button>
 		</template>
 	</modal-exchange>
 </template>
@@ -44,12 +44,13 @@ import { useVuelidate } from '@vuelidate/core';
 import { required, helpers, numeric, minLength, maxLength, url } from '@vuelidate/validators';
 
 import FormErrors from './FormErrors.vue';
+
 import ModalExchange from './ModalExchange.vue';
 
 export default {
 	components: {
 		FormErrors,
-		ModalExchange,
+		ModalExchange
 	},
 
 	props: {

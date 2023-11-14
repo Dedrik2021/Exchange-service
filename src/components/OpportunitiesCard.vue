@@ -49,9 +49,7 @@
 				</div>
 			</div>
 			<footer class="card-footer">
-				<button type="button" class="button is-block is-success is-light is-fullwidth">
-					Check deal
-				</button>
+                <opportunity-deal-modal :opportunity="opportunity" />
 			</footer>
 		</div>
 		<br />
@@ -59,12 +57,18 @@
 </template>
 
 <script>
+import OpportunityDealModal from './OpportunityDealModal.vue';
+
 export default {
+    components: {
+        OpportunityDealModal
+    },
+
 	props: {
 		opportunities: {
 			type: Object,
 			required: true,
-		},
+		}
 	},
 };
 </script>
