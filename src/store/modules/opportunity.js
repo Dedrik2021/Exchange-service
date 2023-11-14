@@ -23,7 +23,7 @@ const extraDataForOpportunity = async (opportunity, id) => {
 	const fromUserDoc = await getDoc(opportunity.fromUser);
 	opportunity.fromUser = { ...fromUserDoc.data(), id: fromUserDoc.id };
 
-    opportunity.id = id
+	opportunity.id = id;
 
 	return opportunity;
 };
@@ -52,9 +52,9 @@ export default {
 			);
 
 			const opportunitiesSnap = await getDocs(opportunityQuery);
-			const opportunities = await Promise.all(opportunitiesSnap.docs.map(
-				(doc) => (extraDataForOpportunity(doc.data(), doc.id)),
-			));
+			const opportunities = await Promise.all(
+				opportunitiesSnap.docs.map((doc) => extraDataForOpportunity(doc.data(), doc.id)),
+			);
 			commit('setOpportunities', { resource: 'opportunities', opportunities });
 		},
 
@@ -71,9 +71,9 @@ export default {
 			);
 
 			const opportunitiesSnap = await getDocs(opportunityQuery);
-			const opportunities = await Promise.all(opportunitiesSnap.docs.map(
-				(doc) => (extraDataForOpportunity(doc.data(), doc.id)),
-			));
+			const opportunities = await Promise.all(
+				opportunitiesSnap.docs.map((doc) => extraDataForOpportunity(doc.data(), doc.id)),
+			);
 			commit('setOpportunities', { resource: 'sendOpportunities', opportunities });
 		},
 
@@ -84,7 +84,7 @@ export default {
 				toUser: doc(database, 'users', data.toUserId),
 				fromUser: doc(database, 'users', data.formUserId),
 				toExchange: doc(database, 'exchanges', data.toExchangeId),
-                status: 'pending'
+				status: 'pending',
 			};
 
 			if (data.formExchangeId) {
@@ -96,6 +96,16 @@ export default {
 			await addDoc(collection(database, 'opportunities'), opportunity);
 			dispatch('toast/success', 'Opportunity vas send!', { root: true });
 
+			onSuccess();
+		},
+
+		async acceptOpportunity(_, { opportunity, onSuccess }) {
+			console.log(opportunity);
+			onSuccess();
+		},
+
+		async declineOpportunity(_, { opportunity, onSuccess }) {
+			console.log(opportunity);
 			onSuccess();
 		},
 	},

@@ -19,7 +19,10 @@
 				<slot/>
 				</section>
 				<footer class="modal-card-foot">
-					<button :disabled="isDisabled" @click="submitModal" type="button" class="button is-success">
+					<template v-if="$slots.footerButtons">
+						<slot name="footerButtons" />
+					</template>
+					<button v-else :disabled="isDisabled" @click="submitModal" type="button" class="button is-success">
 						Save changes
 					</button>
 					<button @click="closeModal" class="button">Cancel</button>
