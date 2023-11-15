@@ -1,5 +1,5 @@
 <template>
-	<modal-exchange ref="modalExchange">
+	<modal-exchange ref="modalExchange" :headerText="headerText">
 		<div>
 			<h1>User "{{ opportunity.fromUser.username }}" has an amazing offer for you!</h1>
 			<template v-if="opportunity.fromExchangeId">
@@ -57,7 +57,7 @@
 		</template>
 		<template #footerButtons >
 			<button @click="acceptOpportunity" class="button is-success">Accept Deal</button>
-			<button @click="acceptOpportunity" class="button is-danger">Decline Deal</button>
+			<button @click="declineOpportunity" class="button is-danger">Decline Deal</button>
 		</template>
 	</modal-exchange>
 </template>
@@ -84,6 +84,9 @@ export default {
 	computed: {
 		modal() {
 			return this.$refs.modalExchange
+		},
+		headerText() {
+			return this.opportunity.fromExchangeId ? `Here is an offer for a ${this.opportunity.fromExchangeId.type}` : `Here is an offer for credits!`
 		}
 	},
 
@@ -91,13 +94,13 @@ export default {
 		acceptOpportunity() {
 			this.$store.dispatch('opportunity/acceptOpportunity', {
 				opportunity: this.opportunity,
-				onSuccess: this.modal.open
+				onSuccess: () => console.log('close modal')
 			})
 		},
 		declineOpportunity() {
 			this.$store.dispatch('opportunity/declineOpportunity', {
 				opportunity: this.opportunity,
-				onSuccess: this.modal.close
+				onSuccess: () => console.log('close modal')
 			})
 		},
 	},

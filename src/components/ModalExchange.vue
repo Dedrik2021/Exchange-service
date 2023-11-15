@@ -12,7 +12,7 @@
 			<div class="modal-background"></div>
 			<div class="modal-card">
 				<header class="modal-card-head">
-					<p class="modal-card-title">Update Data</p>
+					<p class="modal-card-title">{{ headerText }}</p>
 					<button @click="closeModal" class="delete" aria-label="close"></button>
 				</header>
 				<section class="modal-card-body">
@@ -35,6 +35,10 @@
 <script>
 export default {
 	props: {
+		headerText: {
+			type: String,
+			default: "Confirmation Window"
+		},
 		onModalSubmit: {
 			type: Function,
 			required: false

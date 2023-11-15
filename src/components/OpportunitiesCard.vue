@@ -49,7 +49,8 @@
 				</div>
 			</div>
 			<footer class="card-footer">
-                <opportunity-deal-modal :opportunity="opportunity" />
+                <opportunity-deal-modal v-if="opportunity.status === 'pending'" :opportunity="opportunity" />
+                <opportunity-result-modal v-else :opportunity="opportunity" />
 			</footer>
 		</div>
 		<br />
@@ -58,10 +59,12 @@
 
 <script>
 import OpportunityDealModal from './OpportunityDealModal.vue';
+import OpportunityResultModal from './OpportunityResultModal.vue';
 
 export default {
     components: {
-        OpportunityDealModal
+        OpportunityDealModal,
+        OpportunityResultModal
     },
 
 	props: {

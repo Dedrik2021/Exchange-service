@@ -7,6 +7,7 @@ import {
 	where,
 	getDocs,
 	getDoc,
+    updateDoc
 } from 'firebase/firestore';
 
 import { database } from '@/firebase/db';
@@ -99,13 +100,20 @@ export default {
 			onSuccess();
 		},
 
-		async acceptOpportunity(_, { opportunity, onSuccess }) {
-			console.log(opportunity);
+		async acceptOpportunity({commit, dispatch}, { opportunity, onSuccess }) {
+			const oppRef = doc(database, 'opportunities', opportunity.id)
+            await updateDoc(oppRef, {status: 'accepted'})
+            commit('changeOpportunityStatus', {id: opportunity.id, status: 'accepted'})
+            dispatch('toast/success', 'Opportunity vas accepted!', { root: true });
+
 			onSuccess();
 		},
 
-		async declineOpportunity(_, { opportunity, onSuccess }) {
-			console.log(opportunity);
+		async declineOpportunity({commit, dispatch}, { opportunity, onSuccess }) {
+			const oppRef = doc(database, 'opportunities', opportunity.id)
+            await updateDoc(oppRef, {status: 'declined'})
+            commit('changeOpportunityStatus', {id: opportunity.id, status: 'declined'})
+            dispatch('toast/error', 'Opportunity vas declined!', { root: true });
 			onSuccess();
 		},
 	},
@@ -114,5 +122,10 @@ export default {
 		setOpportunities(state, { resource, opportunities }) {
 			state[resource] = opportunities;
 		},
+
+        changeOpportunityStatus(state, {id, status}) {
+            const index = state.opportunities.findIndex(o => o.id === id)
+            state.opportunities[index].status = status
+        }
 	},
 };
