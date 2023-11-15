@@ -169,5 +169,8 @@ export default {
 		updateProfile(state, profile) {
 			state.data = { ...state.data, profile };
 		},
+		updateCredit(state, credit) {
+			state.data.credit += credit
+		}
 	},
 };

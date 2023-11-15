@@ -7,7 +7,8 @@ import {
 	where,
 	getDocs,
 	getDoc,
-    updateDoc
+    updateDoc,
+    increment
 } from 'firebase/firestore';
 
 import { database } from '@/firebase/db';
@@ -78,7 +79,7 @@ export default {
 			commit('setOpportunities', { resource: 'sendOpportunities', opportunities });
 		},
 
-		async createOpportunity({ dispatch }, { data, onSuccess }) {
+		async createOpportunity({ dispatch, commit }, { data, onSuccess }) {
 			const opportunity = {
 				title: data.title,
 				createAt: Timestamp.fromDate(new Date()),
@@ -95,6 +96,14 @@ export default {
 			}
 
 			await addDoc(collection(database, 'opportunities'), opportunity);
+
+            if (opportunity.price) {
+                await updateDoc(opportunity.fromUser, {
+                    credit: increment(-opportunity.price)
+                })
+                commit('user/updateCredit', -opportunity.price, {root: true})
+            }
+
 			dispatch('toast/success', 'Opportunity vas send!', { root: true });
 
 			onSuccess();
@@ -103,6 +112,15 @@ export default {
 		async acceptOpportunity({commit, dispatch}, { opportunity, onSuccess }) {
 			const oppRef = doc(database, 'opportunities', opportunity.id)
             await updateDoc(oppRef, {status: 'accepted'})
+
+            if (opportunity.price) {
+                const userRef = doc(database, 'users', opportunity.toUser.id)
+                await updateDoc(userRef, {
+                    credit: increment(opportunity.price)
+                })
+                commit('user/updateCredit', opportunity.price, {root: true})
+            }
+
             commit('changeOpportunityStatus', {id: opportunity.id, status: 'accepted'})
             dispatch('toast/success', 'Opportunity vas accepted!', { root: true });
 
@@ -112,6 +130,13 @@ export default {
 		async declineOpportunity({commit, dispatch}, { opportunity, onSuccess }) {
 			const oppRef = doc(database, 'opportunities', opportunity.id)
             await updateDoc(oppRef, {status: 'declined'})
+            if (opportunity.price) {
+                const fromUserRef = doc(database, 'users', opportunity.fromUser.id)
+                await updateDoc(fromUserRef, {
+                    credit: increment(opportunity.price)
+                })
+            }
+
             commit('changeOpportunityStatus', {id: opportunity.id, status: 'declined'})
             dispatch('toast/error', 'Opportunity vas declined!', { root: true });
 			onSuccess();

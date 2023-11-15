@@ -33,10 +33,10 @@
 						</h2>
 						<div class="level">
 							<div class="level-left">
-								<div class="item-author">Oleg</div>
+								<div class="item-author">{{ item?.type }}</div>
 								<!-- <div class="item-author">{{ item.user?.id }}</div> -->
 							</div>
-							<div class="level-right">27th December 2019</div>
+							<div class="level-right">{{ item.createAt.toDate().toDateString() }}</div>
 						</div>
 					</div>
 				</li>

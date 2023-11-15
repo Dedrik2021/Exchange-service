@@ -1,5 +1,8 @@
 <template>
-	<modal-exchange :onModalSubmit="createOpportunity" :isDisabled="!isAllowedPrice">
+	<modal-exchange
+		:onModalSubmit="createOpportunity"
+		:isDisabled="!isAllowedPrice || hasNotEnoughCredit"
+	>
 		<div class="deal">
 			<div class="deal-highlight">{{ exchange.user.username }}'s Offer</div>
 			<div class="deal-wrapper">
@@ -48,12 +51,24 @@
 					<span>Your price is: </span>
 					<span class="deal-highlight">{{ offeredPrice }} $</span>
 				</div>
-				<div v-if="priceDifferenceText" :class="percentageDifferenceClass" class="price">
-					{{ priceDifferenceText }}
+				<div
+					v-if="percentageDifference !== null"
+					:class="percentageDifferenceClass"
+					class="price is-small message mb-1"
+				>
+					<div class="message-body">
+						{{ priceDifferenceText }}
+					</div>
 				</div>
-				<div v-if="percentageDifference">
-					Allowed difference is not less than {{ ALLOWED_PRICE_DIFFERENCE }}%
+
+				<div v-if="hasNotEnoughCredit" class="message is-danger is-small">
+					<div class="message-body">
+						You don't have enough credit for this transaction. Remaining credit:
+						{{ user.credit }}
+					</div>
 				</div>
+
+				<div>Allowed difference is not less than {{ ALLOWED_PRICE_DIFFERENCE }}%</div>
 			</div>
 		</div>
 		<template #activator>
@@ -100,9 +115,16 @@ export default {
 	},
 
 	computed: {
-        user() {
-            return this.$store.state.user.data
-        },
+		user() {
+			return this.$store.state.user.data;
+		},
+
+		hasNotEnoughCredit() {
+			if (!this.isPriceExchange) {
+				return false;
+			}
+			return this.user.credit < this.selectedPrice;
+		},
 
 		offeredPrice() {
 			if (this.isPriceExchange) {
@@ -157,17 +179,17 @@ export default {
 	},
 
 	methods: {
-		createOpportunity({onSuccess}) {
+		createOpportunity({ onSuccess }) {
 			const data = {
-                title: this.exchange.title,
-                formUserId: this.user.id,
-                formExchangeId: this.selectedExchange?.id,
-                toExchangeId: this.exchange.id,
-                toUserId: this.exchange.user.id,
-                price: this.selectedPrice
-            }
+				title: this.exchange.title,
+				formUserId: this.user.id,
+				formExchangeId: this.selectedExchange?.id,
+				toExchangeId: this.exchange.id,
+				toUserId: this.exchange.user.id,
+				price: this.selectedPrice,
+			};
 
-            this.$store.dispatch('opportunity/createOpportunity', {data, onSuccess})
+			this.$store.dispatch('opportunity/createOpportunity', { data, onSuccess });
 		},
 	},
 };

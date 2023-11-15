@@ -7,6 +7,7 @@ import {
 	addDoc,
 	collection,
 	where,
+	Timestamp
 } from 'firebase/firestore';
 import slugify from 'slugify';
 
@@ -44,6 +45,7 @@ export default {
 				lower: true,
 				strict: true,
 			});
+			data.createAt = Timestamp.fromDate(new Date())
 			await addDoc(collection(database, 'exchanges'), data);
 			dispatch('toast/success', 'Exchange was created succesfuly!', { root: true });
 
