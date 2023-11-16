@@ -26,10 +26,10 @@
 							<span>Search For</span>
 						</div>
 						<div class="level-item">
-							<input type="text" class="input" placeholder="Driller" />
+							<input @input="handleSearch" :value="searchedValue" type="text" class="input" placeholder="Driller" />
 						</div>
 						<div class="level-item">
-							<span>Searching "Coding"</span>
+							<span v-if="searchedValue">Searching "{{searchedValue}}"</span>
 						</div>
 					</div>
 				</div>
@@ -38,6 +38,28 @@
 	</div>
 	<!-- HERO END -->
 </template>
+
+<script>
+export default {
+	props: {
+		onSearch: {
+			type: Function,
+			required: true
+		}
+	},
+	data() {
+		return {
+			searchedValue: ""
+		}
+	},
+	methods: {
+		handleSearch({target}) {
+			this.searchedValue = target.value
+			this.onSearch(target.value)
+		}
+	}
+}
+</script>
 
 <style scoped lang="scss">
 .hero-section {

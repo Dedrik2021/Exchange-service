@@ -1,9 +1,13 @@
 <template>
 	<div id="exchangario">
-		<hero-exchange />
+		<hero-exchange :onSearch="filterExchanges" />
 		<exchange-list :exchanges="exchanges" />
 
-		<pagination-exchange :onNextPage="getMorExchanges" :isFetching="isFetchingMoreData" :page="currentPage" />
+		<pagination-exchange
+			:onNextPage="getMorExchanges"
+			:isFetching="isFetchingMoreData"
+			:page="currentPage"
+		/>
 	</div>
 </template>
 
@@ -19,16 +23,22 @@ export default {
 		HeroExchange,
 	},
 
+	data() {
+		return {
+			searchExchangeTitle: ""
+		}
+	},
+
 	computed: {
 		exchanges() {
-			return this.$store.state.exchange.items;
+			return this.$store.getters['exchange/filterExchanges'](this.searchExchangeTitle)
 		},
 		isFetchingMoreData() {
 			return this.$store.state.exchange.pagination.isFetchingData;
 		},
 		currentPage() {
-			return this.$store.getters['exchange/currentPage']
-		}
+			return this.$store.getters['exchange/currentPage'];
+		},
 	},
 
 	created() {
@@ -38,6 +48,9 @@ export default {
 	methods: {
 		getMorExchanges({ page }) {
 			this.$store.dispatch('exchange/getMoreExchanges', { page });
+		},
+		filterExchanges(searchValue) {
+			this.searchExchangeTitle = searchValue
 		},
 	},
 };

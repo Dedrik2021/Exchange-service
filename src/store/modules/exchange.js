@@ -41,6 +41,17 @@ export default {
 			if (!state.pagination.paginationHistory) return 1;
 			return state.pagination.paginationHistory.length;
 		},
+		filterExchanges: state => searchedTitle => {
+			const {items} = state
+
+			if (!searchedTitle) return items
+
+			const filteredExchanges = items.filter(item => {
+				return item.title && item.title.toLowerCase().includes(searchedTitle.toLowerCase())
+			})
+
+			return filteredExchanges
+		}
 	},
 
 	actions: {
