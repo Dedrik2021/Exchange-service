@@ -11,18 +11,20 @@
 						>
 							{{ title }}
 						</router-link>
-						<span
-							role="button"
+						<button
+							type="button"
 							tabindex="0"
+							:class="{'is-active': isMenuOpen}"
 							class="navbar-burger burger has-text-white"
 							data-target="navbar-menu"
+							@click="isMenuOpen = !isMenuOpen"
 						>
 							<span></span>
 							<span></span>
 							<span></span>
-						</span>
+						</button>
 					</div>
-					<div id="navbar-menu" class="navbar-menu">
+					<div id="navbar-menu" class="navbar-menu" :class="{'is-active': isMenuOpen}">
 						<ul class="navbar-end">
 							<li v-if="isAuthenticated" class="navbar-item">
 								{{ user?.email }}
@@ -81,9 +83,31 @@ export default {
 		},
 	},
 
+	data() {
+		return {
+			isMenuOpen: false
+		}
+	},
+
 	setup() {
 		const { isAuthenticated, user } = useAuth();
 		return { isAuthenticated, user };
+	},
+
+	created() {
+		window.addEventListener('resize', this.handleResizing)
+	},
+
+	unmounted() {
+		window.removeEventListener('resize', this.handleResizing)
+	},
+
+	methods: {
+		handleResizing({target}) {
+			if (this.isMenuOpen && target.innerWidth > 1020) {
+				this.isMenuOpen = false
+			}
+		}
 	},
 
 	computed: {
@@ -95,7 +119,7 @@ export default {
 			} else {
 				return this.items;
 			}
-		},
+		}
 	},
 };
 </script>
