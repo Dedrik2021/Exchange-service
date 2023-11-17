@@ -8,10 +8,11 @@
 			</div>
 			<div class="field">
 				<label class="title">Avatar</label>
-				<div v-if="inProgress !== 0" class="progress-container">
-					<progress class="progress" :value="progress" max="100"/>
-					<span>{{ progress }}%</span>
+				<div v-if="inProgress !== 100" class="progress-container">
+					<progress v-if="inProgress !== 0" class="progress" :value="progress" max="100"/>
+					<span v-if="inProgress !== 0">{{ Math.floor(progress) }}%</span>
 				</div>
+				<span v-if="inProgress === 100">File uploaded</span>
 				<div class="file has-name">
 					<label class="file-label">
 						<input @input="handleUpload" class="file-input" type="file" name="resume" />
