@@ -5,6 +5,7 @@ import {
 	signOut,
 	signInWithEmailAndPassword,
 } from 'firebase/auth';
+import {getStorage, ref, uploadBytesResumable, getDownloadURL} from 'firebase/storage'
 import {
 	doc,
 	setDoc,
@@ -151,6 +152,22 @@ export default {
 			dispatch('toast/success', `Profile has been updated!`, { root: true });
 			onSuccess();
 		},
+
+		async uploadImage(_, {bytes, name, username, onSuccess, onProgress}) {
+			const storage = getStorage()
+			const storageRef = ref(storage, `${username}/${username}-${name}`)
+
+			const uploadTask = uploadBytesResumable(storageRef, bytes)
+			uploadTask.on("state_changed", (snapshot) => {
+				const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+				onProgress(progress)
+			}, (error) => {
+				console.error(error.message);
+			}, async () => {
+				const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref)
+				onSuccess(downloadUrl)
+			})
+		}
 	},
 
 	mutations: {

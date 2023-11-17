@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Toast from 'vue-toastification';
 
@@ -9,7 +9,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 
-library.add(faStar);
+library.add([faStar, faUpload]);
 let app;
 
 store.dispatch('user/onAuthChange', () => {

@@ -8,8 +8,22 @@
 			</div>
 			<div class="field">
 				<label class="title">Avatar</label>
-				<input class="input" v-model="userProfile.avatar" />
-				<form-errors :errors="v$.userProfile.avatar.$errors" />
+				<div v-if="inProgress !== 0" class="progress-container">
+					<progress class="progress" :value="progress" max="100"/>
+					<span>{{ progress }}%</span>
+				</div>
+				<div class="file has-name">
+					<label class="file-label">
+						<input @input="handleUpload" class="file-input" type="file" name="resume" />
+						<span class="file-cta">
+							<span class="file-icon">
+								<font-awesome-icon icon="upload" />
+							</span>
+							<span class="file-label"> Choose a file… </span>
+						</span>
+					</label>
+					<img v-if="userProfile.avatar" class="image-preview" :src="userProfile.avatar" width="100" height="50" alt="">
+				</div>
 			</div>
 			<div class="field">
 				<label class="title">Info about user</label>
@@ -50,7 +64,7 @@ import ModalExchange from './ModalExchange.vue';
 export default {
 	components: {
 		FormErrors,
-		ModalExchange
+		ModalExchange,
 	},
 
 	props: {
@@ -67,6 +81,7 @@ export default {
 	data() {
 		return {
 			userProfile: { ...this.user },
+			progress: 0
 		};
 	},
 
@@ -111,11 +126,14 @@ export default {
 		};
 	},
 
-    computed: {
-        modal() {
-            return this.$refs.modalExchange
-        }
-    },
+	computed: {
+		modal() {
+			return this.$refs.modalExchange;
+		},
+		inProgress() {
+			return this.progress
+		}
+	},
 
 	methods: {
 		async updateProfile() {
@@ -124,10 +142,47 @@ export default {
 			if (isValid) {
 				this.$store.dispatch('user/updateProfile', {
 					data: this.userProfile,
-					onSuccess: () => this.modal.closeModal()
+					onSuccess: () => this.modal.closeModal(),
 				});
 			}
 		},
+
+		handleUpload({target}) {
+			const self = this
+			const file = target.files[0]
+			const reader = new FileReader()
+			reader.readAsArrayBuffer(file)
+
+			reader.onload = function() {
+				self.progress = reader.result
+				self.$store.dispatch('user/uploadImage', {
+					bytes: reader.result,
+					username: self.userProfile.username,
+					name: file.name,
+					
+					onSuccess: (url) => {
+						self.userProfile.avatar = url
+					},
+					onProgress: (progress) => {
+						self.progress = progress
+						console.log(self.progress);
+					}
+				})
+			}
+		}
 	},
 };
 </script>
+
+
+<style scoped>
+.progress {
+	margin-top: 15px;
+	max-width: 90%;
+}
+.progress-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+</style>
