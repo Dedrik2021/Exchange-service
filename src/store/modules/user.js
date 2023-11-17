@@ -113,7 +113,7 @@ export default {
 		},
 
 		async createUserProfile(_, { id, ...profile }) {
-			await setDoc(doc(database, 'users', id), profile);
+			await setDoc(doc(database, 'users', id), {...profile, id});
 		},
 
 		async logout({ commit, dispatch }) {
@@ -147,6 +147,11 @@ export default {
 
 		async updateProfile({ commit, dispatch }, { data, onSuccess }) {
 			const userRef = doc(database, 'users', data.id);
+
+			if (data.exchanges) {
+				delete data.exchanges
+			}
+
 			await updateDoc(userRef, data);
 			commit('updateProfile', data);
 			dispatch('toast/success', `Profile has been updated!`, { root: true });

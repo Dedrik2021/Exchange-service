@@ -1,7 +1,6 @@
 import {
 	getDocs,
 	getDoc,
-	collectionGroup,
 	query,
 	doc,
 	addDoc,
@@ -59,7 +58,7 @@ export default {
 			commit('resetPagination')
 
 			const exchangesQuery = query(
-				collectionGroup(database, 'exchanges'),
+				collection(database, 'exchanges'),
 				limit(state.pagination.itemCount),
 			);
 			const snapshot = await getDocs(exchangesQuery);
@@ -81,7 +80,7 @@ export default {
 
 			if (page === 'next') {
 				queryData = query(
-					collectionGroup(database, 'exchanges'),
+					collection(database, 'exchanges'),
 					startAfter(state.pagination.lastItem),
 					limit(state.pagination.itemCount),
 				);
@@ -96,7 +95,7 @@ export default {
 
 				state.pagination.paginationHistory.splice(lastItemIndex, 1);
 				queryData = query(
-					collectionGroup(database, 'exchanges'),
+					collection(database, 'exchanges'),
 					startAt(prevItem),
 					limit(state.pagination.itemCount),
 				);
